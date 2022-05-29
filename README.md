@@ -1,4 +1,4 @@
-# Home_Assitant
+# Coisas que Uso no Meu Home Assistant
 Repositorio automação residencial
 
 
