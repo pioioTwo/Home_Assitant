@@ -8,26 +8,26 @@ cards:
     type: grid
     cards:
       - type: entity
-        entity: sensor.ups_4b9d_estado
+        entity: sensor.ups_4b9d_estado # aqui é o sensor de estado do sistema, se esta carrega, carregando ou descarregando 
         state_color: true
         icon: mdi:lightning-bolt-outline
         name: Dispositivo
       - type: entity
-        entity: sensor.ups_4b9d_sinal
+        entity: sensor.ups_4b9d_sinal # Nivel de Sinal Wifi
         state_color: true
         name: Sinal
         icon: mdi:signal
   - entities:
       - color: '#27ae60'
-        entity: sensor.ups_corrente_armazenada_total
+        entity: sensor.ups_corrente_armazenada_total # aqui é o acumulador de corrente total da carga
         name: Carga
       - color: '#e74c3c'
-        entity: sensor.ups_corrente_armazenada_total
+        entity: sensor.ups_corrente_armazenada_total # aqui é o acumulador de corrente que esta na bateria (em desenvolvimento)
         name: Descarga
         show_state: true
       - aggregate_func: min
         color: gray
-        entity: binary_sensor.usp_consumo_estado
+        entity: binary_sensor.usp_consumo_estado # eu criei esse sensor para saber se esta descarregando ou não só para indicar no grafico
         name: Uso
         show fill: true
         show legend: false
@@ -50,6 +50,7 @@ cards:
       - label: Descarregando
         value: 'on'
     type: custom:mini-graph-card
+    
   - square: false
     columns: 2
     type: grid
