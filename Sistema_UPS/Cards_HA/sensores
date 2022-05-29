@@ -1,0 +1,45 @@
+# Guarda o valores Do Sistema UPS
+# ================================================================================================================================================================
+- platform: template
+  sensors:
+    ups_corrente_carga_descarga:
+      friendly_name: "Corrente de carga e descarga"
+      unit_of_measurement: "A"
+      value_template: >-
+        {% if  states("sensor.ups_4b9d_currente_bat") | float < 0 %}
+          {{ (float(states.sensor.ups_4b9d_currente_bat.state) /1000 ) | abs }} 
+        {% else %}
+        {% if  states("sensor.ups_4b9d_currente_bat") | float > 60 %}
+          {{ (float(states.sensor.ups_4b9d_currente_bat.state) /1000 ) | abs }}
+        {% else %}
+          0
+        {% endif %}
+        {% endif %}
+
+# Guarda o valores Do Sistema UPS
+# ================================================================================================================================================================
+- platform: template
+  sensors:
+    ups_capacidade_bateria:
+      friendly_name: "Carga bateria UPS mA/h" # {{ (float(states.sensor.ups_4b9d_currente_bat.state) /1000 )| round(2) }}
+      unit_of_measurement: "A" #{% if  states("sensor.ups_4b9d_currente_bat") | float < 0 and states("sensor.ups_4b9d_tensao_bat") | float > 10 %}
+      value_template: >-  
+        {% if  states("sensor.ups_4b9d_currente_bat") | float < 0 %}
+          {{ (float(states.sensor.ups_corrente_armazenada.state) ) - states.sensor.ups_corrente_carga_descarga.state  }} 
+        {% else %}
+        {% if  states("sensor.ups_4b9d_currente_bat") | float > 60 %}
+          {{ (float(states.sensor.ups_corrente_armazenada.state) ) + (float(states.sensor.ups_corrente_carga_descarga.state) ) }}
+        {% else %}
+          0
+        {% endif %}
+        {% endif %}
+
+    ups_pico_corrente_ultima_carga:
+      friendly_name: "Corrente maxima da ultima carga"
+      unit_of_measurement: "A"
+      value_template: >-
+        {% if  states("sensor.ups_capacidade_bateria") | float > states("sensor.ups_pico_corrente_carga") %}
+          {{ (float(states.sensor.ups_pico_corrente_carga.state) ) =  states("sensor.ups_capacidade_bateria") }} 
+        {% else %}
+          0
+        {% endif %}
