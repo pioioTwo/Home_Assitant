@@ -1,0 +1,14 @@
+# Siatema de Gerenciadmento de Carga e descarga de Bateria
+
+Sistema para aquisição e monitoramento de Variaveis do sistema de uniterrupto fornecimento de energia (UPS)
+
+## 🚀 Começando
+
+Essas instruções permitirão que você obtenha uma cópia do projeto em operação na sua máquina local para fins de desenvolvimento e teste.
+
+Consulte **Implantação** para saber como implantar o projeto.
+
+### 📋 Pré-requisitos
+Hardware ncessario
+ESP8266
+INA220
