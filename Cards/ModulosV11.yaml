@@ -1,0 +1,231 @@
+type: vertical-stack
+cards:
+  - type: custom:button-card
+    layout: icon_name
+    name: Modulos V11
+    icon: mdi:connection
+    styles:
+      grid:
+        - grid-template-areas: '"n i"'
+        - grid-template-columns: 1fr 20%
+      icon:
+        - align-self: end
+        - color: var(--text-primary-color)
+        - height: 35px
+      card:
+        - padding: 4px
+        - height: 45px
+        - background: var(--primary-color)
+      name:
+        - color: var(--text-primary-color)
+        - justify-self: start
+        - padding-left: 35%
+        - font-weight: 500
+        - font-size: 18px
+  - type: custom:auto-entities
+    card:
+      type: grid
+      columns: 2
+      square: false
+    card_param: cards
+    show_empty: fals
+    filter:
+      include:
+        - entity_id: binary_sensor.status_*
+          options:
+            type: custom:mushroom-template-card
+            entity: this.entity_id
+            primary: >-
+              {% if states.this.entity_id.attributes.Modulo is defined %}
+              {{state_attr('this.entity_id', 'Modulo') }} {% else %}
+              {{device_attr('this.entity_id', 'name') }} {%- endif %}
+            secondary: >-
+              {% if is_state(config.entity, 'on') %} Rede: {{
+              state_attr('this.entity_id', 'WiFi_SSID') }} {{
+              state_attr('this.entity_id', 'WiFi_Sinal') }}%
+               {% else %} Desconectado. {%
+              endif%}
+            icon: |-
+              {% if is_state(config.entity, 'on') %}
+                mdi:wifi
+              {%- else %}
+                mdi:lan-disconnect
+              {%- endif %}
+            icon_color: |-
+              {% if is_state('this.entity_id', 'on') %}
+                {% set wifi_sinal = state_attr('this.entity_id', 'WiFi_Sinal') | int %}
+                {% if wifi_sinal > 90 %} 
+                  green
+                {% elif wifi_sinal > 60 %}
+                  light-green
+                {% elif wifi_sinal > 50 %}
+                  lime
+                {% elif wifi_sinal > 40 %}
+                  yellow
+                {% elif wifi_sinal > 30 %}
+                  amber
+                {% elif wifi_sinal > 20 %}
+                  orange
+                {% elif wifi_sinal > 10 %}
+                  deep-orange
+                {% else %}
+                  red
+                {% endif %} 
+              {%- else %}
+                red
+              {%- endif %}
+            layout: horizontal
+            multiline_secondary: true
+            fill_container: false
+            card_mod:
+              style:
+                mushroom-shape-icon$: |
+                  .shape{
+                    {% if is_state(config.entity, 'on') %}
+                      {% set porcent = state_attr('this.entity_id', 'WiFi_Sinal') | int %}
+                    {% else %}
+                    --shape-animation: ping 2.5s infinite;
+                      {% set porcent = 0 | int %}     
+                    {% endif %}
+                    background: radial-gradient(var(--card-background-color) 60%, 
+                                        transparent calc(60% + 1px)), 
+                        conic-gradient(var(--icon-color) {{ porcent }}% 0%, 
+                                        var(--card-background-color) 0% 100%);             
+                  }
+                  .shape:after {
+                    content: "";
+                    height: 100%;
+                    width: 100%;
+                    position: absolute;
+                    border-radius: var(--icon-border-radius);
+                    /* Add back icon shape */
+                    background: var(--shape-color);
+                  }
+                  @keyframes ping {
+                  {% if is_state(config.entity, 'on') %}
+                  {% endif %}
+                    60% { box-shadow: 0 0 0 0 rgba(var(--rgb-red), 10); }
+                    100% { box-shadow: 0 0 5px 15px transparent; }
+                  }
+                .: |
+                  ha-state-icon {
+                      font-family: monospace;
+                      border-radius: 50px;
+                      {% if is_state(config.entity, 'on') %}
+                      animation: clip 2s steps(1) infinite;
+                      {%- else %}
+                      {%- endif %}
+                   }
+                    @keyframes clip {
+                      0% { clip-path: circle(0% at 50% 85%); }
+                      20% { clip-path: circle(30% at 50% 85%); }
+                      40% { clip-path: circle(55% at 50% 85%); }
+                      60% { clip-path: circle(80% at 50% 85%); }
+                    }
+            hold_action:
+              action: more-info
+            tap_action:
+              action: fire-dom-event
+              browser_mod:
+                service: browser_mod.popup
+                data:
+                  content:
+                    type: custom:mod-card
+                    card_mod:
+                      style:
+                        tabbed-card $:
+                          mwc-tab:
+                            $:
+                              mwc-tab-indicator $: |
+                                .mdc-tab-indicator__content--underline {
+                                  border-color: red !important;
+                                  border-width: 3px !important;
+                                }
+                            .: |
+                              mwc-tab {
+                                background: var(--ha-card-background, var(--card-background-color, white) );
+                                border-color: var(--ha-card-border-color, var(--divider-color, #e0e0e0) );
+                                border-width: 3px;
+                                border-top-left-radius: 12px;
+                                border-top-right-radius: 12px;
+                                border-style: solid;
+                                overflow: hidden;
+                              }
+                              section article > * {
+                                --ha-card-border-radius: 0px 1px 12px 12px;
+                              }
+                    card:
+                      type: custom:tabbed-card
+                      options: {}
+                      styles:
+                        '--mdc-theme-primary': orange
+                        '--mdc-tab-text-label-color-default': red
+                        '--mdc-typography-button-font-size': 15px
+                      tabs:
+                        - attributes:
+                            label: Informaacoes
+                            icon: mdi:state-machine
+                            isFadingIndicator: false
+                            minWidth: false
+                            isMinWidthIndicator: false
+                            stacked: false
+                          card:
+                            type: custom:auto-entities
+                            card:
+                              type: entities
+                              state_color: true
+                            filter:
+                              template: |
+                                {%- if device_id('this.entity_id') != None %}
+                                  {%- set binary_sensors = namespace(status=[], other_entities=[]) %}
+                                  {%- set sensors = namespace(wifi_ssid=[], wifi_sinal=[], ip=[], other=[]) %}
+                                  {%- set buttons = namespace(reiniciar=[],  other=[]) %}
+                                  {%- for entity in device_entities(device_id('this.entity_id')) %}
+                                    {%- if states(entity).domain == binary_sensor %}
+                                      {%- if 'status' in entity %}
+                                        {%- set binary_sensors.status = binary_sensors.status + [entity] %}
+                                      {%- elif 'wifi_ssid' in entity or 'wifi_sinal' in entity or 'ip' in entity or 'reiniciar' in entity %}
+                                      {%- else %}
+                                        {%- set binary_sensors.other_entities = binary_sensors.other_entities + [entity] %}
+                                      {%- endif %}
+                                    {%- endif %}
+                                    {%- if states(entity).domain == sensor %}
+                                      {%- if 'wifi_ssid' in entity %}
+                                        {%- set sensors.wifi_ssid = sensors.wifi_ssid + [entity] %}
+                                      {%- elif 'wifi_sinal' in entity %}
+                                        {%- set sensors.wifi_sinal = sensors.wifi_sinal + [entity] %}
+                                      {%- elif 'ip' in entity %}
+                                        {%- set sensors.ip = sensors.ip + [entity] %}
+                                      {%- else %}
+                                        {%- set sensors.other = sensors.other + [entity] %}
+                                      {%- endif %}
+                                    {%- endif %}
+                                    {%- if states(entity).domain == button %}
+                                      {%- if 'reiniciar' in entity %}
+                                        {%- set buttons.reiniciar = buttons.reiniciar + [entity] %}
+                                      {%- else %}
+                                        {%- set buttons.other = buttons.other + [entity] %}
+                                      {%- endif %}
+                                    {%- endif %}
+                                  {%- endfor %}
+                                  {%- for entity in binary_sensors.status %}
+                                    {{ entity }},
+                                  {%- endfor %}
+                                  {%- for entity in sensors.wifi_ssid %}
+                                    {{ entity }},
+                                  {%- endfor %}
+                                  {%- for entity in sensors.wifi_sinal %}
+                                    {{ entity }},
+                                  {%- endfor %}
+                                  {%- for entity in sensors.ip %}
+                                    {{ entity }},
+                                  {%- endfor %}  
+                                  {%- for entity in buttons.reiniciar %}
+                                    {{ entity }},
+                                  {%- endfor %}  
+                                  {%- for entity in binary_sensors.other_entities %}
+                                    {{ entity }},
+                                  {%- endfor %}
+                                {%- else %}
+                                  {{ 'this.entity_id' }},
+                                {%- endif %}
